@@ -15,4 +15,19 @@ const submitQuery = async (req, res) => {
   }
 };
 
-module.exports = { submitQuery };
+
+const getMyQueries = async (req, res) => {
+  try {
+    const userQueries = await queryService.getQueriesByUser(req.user.id);
+
+    res.status(200).json(userQueries);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to fetch queries'
+    });
+  }
+};
+module.exports = {
+  submitQuery,
+  getMyQueries
+};
