@@ -98,6 +98,25 @@ body{
   0 8px 18px rgba(17,24,39,.18);
 }
 
+.glow-btn:disabled,
+.chat-input-row button:disabled,
+.prompt-stack button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+  transform: none;
+  box-shadow: none;
+}
+
+.error-message {
+  margin: 8px 0 4px;
+  padding: 12px 14px;
+  border: 1px solid #f1b5ae;
+  border-radius: 12px;
+  background: #fff1ef;
+  color: #9f2d20;
+  font-weight: 700;
+}
+
 .link-button {
   background:white;
   border:none;

@@ -60,21 +60,6 @@ function FAQ() {
   ];
 
   const categories = ["All", ...new Set(faqs.map((faq) => faq.category))];
-  const quickTopics = [
-    { label: "VINS", search: "VINS", category: "All" },
-    { label: "NOC", search: "", category: "NOC" },
-    { label: "attendance", search: "", category: "Attendance" },
-    { label: "certificates", search: "", category: "Certificate" },
-    { label: "team formation", search: "", category: "Team Formation" },
-    { label: "ViBe", search: "", category: "ViBe" },
-  ];
-
-  const applyQuickTopic = (topic) => {
-    setSearch(topic.search);
-    setSelectedCategory(topic.category);
-    setOpenIndex(null);
-  };
-
   const filteredFaqs = faqs.filter((faq) => {
     const keyword = search.toLowerCase();
     const matchesSearch =

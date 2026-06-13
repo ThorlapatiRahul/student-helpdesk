@@ -1,13 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const multer = require('multer');
 const chatController = require('../controllers/chatController');
-const authMiddleware = require('../middleware/authMiddleware');
+const jwt = require('jsonwebtoken');
 
-// Setup multer for memory storage
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// Optional authentication middleware (unchanged)
+const optionalAuth = (req, res, next) => {
+  const token = req.header('Authorization')?.split(' ')[1];
+  if (!token) return next();
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key');
+    next();
+  } catch {
+    res.status(400).json({ error: 'Invalid token.' });
+  }
+};
 
-router.post('/', authMiddleware, upload.single('file'), chatController.handleChat);
+// POST /api/chat – accept JSON body with message (no file upload)
+router.post('/', optionalAuth, chatController.handleChat);
 
 module.exports = router;

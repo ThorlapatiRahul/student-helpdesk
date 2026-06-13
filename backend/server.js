@@ -1,4 +1,9 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '.env') });
+console.log('=== ENV DEBUG ===');
+console.log('OPENAI_API_KEY length =', (process.env.OPENAI_API_KEY || '').length);
+console.log('JWT_SECRET length =', (process.env.JWT_SECRET || '').length);
+console.log('VITE_API_BASE =', process.env.VITE_API_BASE);
+console.log('====================');
 const express = require('express');
 const cors = require('cors');
 
@@ -21,7 +26,7 @@ app.use('/api/queries', queryRoutes);
 app.use('/api/chat', chatRoutes);
 
 // Error handling middleware
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Something went wrong on the server!' });
 });

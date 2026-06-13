@@ -1,6 +1,6 @@
 const { faqs } = require('../data/mockDb');
 
-const createPrompt = (message, file) => {
+const createPrompt = (message, file, mode = 'client') => {
   const faqText = faqs
     .map((faq) => `Q: ${faq.question}\nA: ${faq.answer}`)
     .join('\n\n');
@@ -15,36 +15,86 @@ const createPrompt = (message, file) => {
     }
   }
 
-  return `You are a helpful student help desk AI mentor for the Vicharanashala internship. Answer questions using the FAQ content below and provide clear advice for students. Do not fabricate details beyond the FAQ content and best practices for internship-related questions.\n\nFAQs:\n${faqText}\n\nStudent question:\n${message}${fileDetails}`;
+  const audience =
+    mode === 'admin'
+      ? 'You are helping a helpdesk admin triage student support questions, draft replies, and spot FAQ candidates.'
+      : 'You are helping a student get clear, friendly support from the helpdesk.';
+
+  return `${audience} Use the FAQ content below first, and be honest when the FAQ does not contain enough detail. Keep the answer practical, original, and easy to act on.\n\nFAQs:\n${faqText}\n\nQuestion:\n${message}${fileDetails}`;
 };
 
 const findFaqFallback = (message) => {
   const lowerQuery = message.toLowerCase();
-  return faqs.find(
-    (faq) =>
-      faq.question.toLowerCase().includes(lowerQuery) ||
-      faq.answer.toLowerCase().includes(lowerQuery) ||
-      faq.category.toLowerCase().includes(lowerQuery)
-  );
+  const stopWords = new Set([
+    'about',
+    'should',
+    'would',
+    'could',
+    'with',
+    'from',
+    'that',
+    'this',
+    'how',
+    'what',
+    'when',
+    'where',
+    'which',
+    'will',
+    'have',
+    'many',
+    'your',
+  ]);
+  const terms = lowerQuery
+    .split(/\W+/)
+    .filter((term) => term.length > 2 && !stopWords.has(term));
+
+  let bestMatch = null;
+  let bestScore = 0;
+
+  for (const faq of faqs) {
+    const faqText = `${faq.question} ${faq.answer} ${faq.category}`.toLowerCase();
+    const score = terms.reduce(
+      (total, term) => total + (faqText.includes(term) ? 1 : 0),
+      0,
+    );
+
+    if (score > bestScore) {
+      bestMatch = faq;
+      bestScore = score;
+    }
+  }
+
+  return bestMatch;
 };
 
-const processChat = async (message, file) => {
+const buildFallbackResponse = (message, file, mode) => {
+  const fallbackFaq = message ? findFaqFallback(message) : null;
+
+  if (fallbackFaq) {
+    return `Based on the FAQ: ${fallbackFaq.answer}`;
+  }
+
+  if (mode === 'admin') {
+    return 'Admin assistant: I can help summarize student issues, draft response text, and suggest repeated questions that should become FAQ entries. Share a query or topic to work on.';
+  }
+
+  return `Student assistant: I can help with internship FAQs, NOC, certificates, ViBe login, team formation, attendance, and support queries.${
+    file ? ` I also received your file: ${file.originalname}.` : ''
+  }`;
+};
+
+const processChat = async (message, file, mode = 'client') => {
   const apiKey = process.env.OPENAI_API_KEY;
-  const prompt = createPrompt(message || '');
+  const prompt = createPrompt(message || '', file, mode);
 
   if (!apiKey) {
-    const fallbackFaq = message ? findFaqFallback(message) : null;
-    const responseText = fallbackFaq
-      ? `FAQ-based answer: ${fallbackFaq.answer}`
-      : `This is a local AI mentor mock response. You asked: "${message}".${
-          file ? ` Uploaded file: ${file.originalname}.` : ''
-        }`;
+    const responseText = buildFallbackResponse(message || '', file, mode);
 
-    return { response: responseText };
+    return { response: responseText, reply: responseText };
   }
 
   const requestBody = {
-    model: process.env.OPENAI_MODEL || 'gpt-3.5-turbo',
+    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
     messages: [
       {
         role: 'system',
@@ -59,24 +109,30 @@ const processChat = async (message, file) => {
     temperature: 0.7,
   };
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(requestBody),
-  });
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify(requestBody),
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`OpenAI request failed: ${errorText}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenAI request failed: ${errorText}`);
+    }
+
+    const result = await response.json();
+    const responseText = result.choices?.[0]?.message?.content?.trim() || 'I could not generate an answer.';
+    return { response: responseText, reply: responseText };
+  } catch (err) {
+    console.error('OpenAI request error:', err);
+    // Fallback response when OpenAI fails
+    const fallbackText = buildFallbackResponse(message || '', file, mode);
+    return { response: fallbackText, reply: fallbackText };
   }
-
-  const result = await response.json();
-  const responseText = result.choices?.[0]?.message?.content?.trim() || 'I could not generate an answer.';
-
-  return { response: responseText };
 };
 
 module.exports = { processChat };

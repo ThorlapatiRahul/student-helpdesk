@@ -10,7 +10,7 @@ const submitQuery = async (req, res) => {
     // req.user is set by authMiddleware
     const newQuery = await queryService.addQuery(req.user.id, query);
     res.status(201).json({ message: 'Query submitted successfully', data: newQuery });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Failed to submit query' });
   }
 };

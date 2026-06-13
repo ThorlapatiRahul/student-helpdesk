@@ -6,14 +6,11 @@ import Welcome from "./pages/Welcome";
 import Overview from "./pages/Overview";
 import FAQ from "./pages/FAQ";
 import AskQuery from "./pages/AskQuery";
-import Chat from "./pages/Chat";
-<<<<<<< Updated upstream
+import Chatbot from "./components/Chatbot";
 import Feedback from "./pages/Feedback";
-=======
 import AdminDashboard from "./pages/AdminDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import AIChatbot from "./pages/AIChatbot";
->>>>>>> Stashed changes
 
 function App() {
   return (
@@ -26,7 +23,7 @@ function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/ask" element={<AskQuery />} />
         <Route path="/feedback" element={<Feedback />} />
-        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat" element={<Chatbot />} />
         <Route path="/ai-chatbot" element={<AIChatbot />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />

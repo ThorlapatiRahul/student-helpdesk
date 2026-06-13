@@ -5,51 +5,28 @@ import "./Login.css";
 import heroImage from "../assets/image.png";
 
 function Login() {
-
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-<<<<<<< Updated upstream
-=======
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
->>>>>>> Stashed changes
 
   const handleLogin = async () => {
     setError("");
 
-<<<<<<< Updated upstream
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!email) {
-      alert("Enter Email");
-=======
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       setError("Enter Email");
->>>>>>> Stashed changes
       return;
     }
 
     if (!emailRegex.test(email)) {
-<<<<<<< Updated upstream
-      alert("Enter Valid Email");
-=======
       setError("Enter a valid email address");
->>>>>>> Stashed changes
       return;
     }
 
     if (!password) {
-<<<<<<< Updated upstream
-      alert("Enter Password");
-      return;
-    }
-
-    navigate("/welcome");
-=======
       setError("Enter Password");
       return;
     }
@@ -76,7 +53,6 @@ function Login() {
     } finally {
       setLoading(false);
     }
->>>>>>> Stashed changes
   };
 
   return (
@@ -113,11 +89,8 @@ function Login() {
         <button
           className="glow-btn full-width-btn"
           onClick={handleLogin}
-<<<<<<< Updated upstream
-=======
           disabled={loading}
           style={{ width: "100%" }}
->>>>>>> Stashed changes
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
