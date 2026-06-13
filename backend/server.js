@@ -1,4 +1,4 @@
-require('dotenv').config({ path: require('path').resolve(__dirname, '.env') });
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
 console.log('=== ENV DEBUG ===');
 console.log('OPENAI_API_KEY length =', (process.env.OPENAI_API_KEY || '').length);
 console.log('JWT_SECRET length =', (process.env.JWT_SECRET || '').length);
