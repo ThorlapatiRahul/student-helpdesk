@@ -132,6 +132,81 @@
   margin-top: 24px;
 }
 
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.popup-card {
+  width: 400px;
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  animation: popupShow 0.25s ease;
+}
+
+.popup-card h3 {
+  color: #0f172a;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.popup-card p {
+  color: #555;
+  margin-bottom: 25px;
+}
+
+.popup-btn {
+  width: 100%;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  color: white;
+  background: linear-gradient(
+    135deg,
+    #ff9800,
+    #ff7b00
+  );
+  margin-bottom: 10px;
+}
+
+.popup-btn:hover {
+  transform: translateY(-2px);
+}
+
+.popup-close {
+  width: 100%;
+  border: none;
+  padding: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #f3f4f6;
+}
+
+@keyframes popupShow {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @media (max-width: 980px) {
   .auth-container {
     grid-template-columns: 1fr;

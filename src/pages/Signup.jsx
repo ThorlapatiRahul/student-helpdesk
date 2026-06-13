@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 import "../App.css";
 import "./Signup.css";
 
 function Signup() {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState(location.state?.email || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!name) {
@@ -44,8 +46,25 @@ function Signup() {
       return;
     }
 
-    alert("Signup successful! Please sign in to continue.");
-    navigate("/");
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/signup",
+        {
+          name,
+          email,
+          password,
+        }
+      );
+
+      alert(response.data.message);
+      navigate("/");
+    } catch (error) {
+      console.error(error);
+      alert(
+        error.response?.data?.message ||
+          "Signup failed. Please try again."
+      );
+    }
   };
 
   return (
@@ -53,7 +72,10 @@ function Signup() {
       <div className="auth-container">
         <div className="card auth-card">
           <h1 className="title">Create Account</h1>
-          <p className="subtitle">Please fill in the required fields to sign up.</p>
+
+          <p className="subtitle">
+            Please fill in the required fields to sign up.
+          </p>
 
           <input
             className="input"
@@ -105,9 +127,13 @@ function Signup() {
 
         <div className="auth-side">
           <div className="auth-side-content">
-            <h2 className="auth-side-title">Join the learning experience</h2>
+            <h2 className="auth-side-title">
+              Join the learning experience
+            </h2>
+
             <p className="auth-side-copy">
-              Create your account now to access the full platform, connect with mentors, and explore your next course.
+              Create your account now to access the full platform,
+              connect with mentors, and explore your next course.
             </p>
           </div>
         </div>
