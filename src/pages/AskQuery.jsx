@@ -1,30 +1,48 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../App.css";
 
-function AskQuery(){
-
-  const [query,setQuery] = useState("");
+function AskQuery() {
+  const [query, setQuery] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
 
   const navigate = useNavigate();
 
-  const submitQuery = () => {
-
-    if(!query){
-      alert("Please Enter Question");
+  const submitQuery = async () => {
+    if (!query.trim()) {
+      setPopupMessage("Please Enter Question");
+      setShowPopup(true);
       return;
     }
 
-    alert("Question Submitted Successfully");
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/ask",
+        {
+          question: query,
+        }
+      );
 
-    localStorage.setItem("query",query);
+      setPopupMessage(response.data.message);
+
+      setShowPopup(true);
+
+      setQuery("");
+    } catch (error) {
+      setPopupMessage(
+        error.response?.data?.message ||
+        "Failed to submit question"
+      );
+
+      setShowPopup(true);
+    }
   };
 
-  return(
+  return (
     <div className="page">
-
       <div className="card">
-
         <h1 className="title">
           Ask Your Question
         </h1>
@@ -37,7 +55,7 @@ function AskQuery(){
           className="textarea"
           placeholder="Example: How can I apply for leave?"
           value={query}
-          onChange={(e)=>setQuery(e.target.value)}
+          onChange={(e) => setQuery(e.target.value)}
         />
 
         <button
@@ -49,8 +67,8 @@ function AskQuery(){
 
         <button
           className="glow-btn"
-          onClick={()=>navigate("/chat")}
-          style={{marginLeft:"15px"}}
+          onClick={() => navigate("/chat")}
+          style={{ marginLeft: "15px" }}
         >
           Ask AI Mentor
         </button>
@@ -61,9 +79,28 @@ function AskQuery(){
         >
           Send Feedback
         </button>
-
       </div>
 
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-card">
+            <h2 className="popup-title">
+              Success 🎉
+            </h2>
+
+            <p className="popup-message">
+              {popupMessage}
+            </p>
+
+            <button
+              className="popup-btn"
+              onClick={() => setShowPopup(false)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

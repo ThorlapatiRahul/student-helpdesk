@@ -12,8 +12,11 @@ function Signup() {
   const [email, setEmail] = useState(location.state?.email || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (event) => {
+    event.preventDefault();
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!name) {
@@ -46,12 +49,14 @@ function Signup() {
       return;
     }
 
+    setLoading(true);
+
     try {
       const response = await axios.post(
         "http://localhost:5000/signup",
         {
-          name,
-          email,
+          name: name.trim(),
+          email: email.trim(),
           password,
         }
       );
@@ -60,10 +65,13 @@ function Signup() {
       navigate("/");
     } catch (error) {
       console.error(error);
+
       alert(
         error.response?.data?.message ||
-          "Signup failed. Please try again."
+        "Signup failed. Please try again."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,44 +85,47 @@ function Signup() {
             Please fill in the required fields to sign up.
           </p>
 
-          <input
-            className="input"
-            type="text"
-            placeholder="Full Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
+          <form onSubmit={handleSignUp} className="auth-form">
+            <input
+              className="input"
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
 
-          <input
-            className="input"
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+            <input
+              className="input"
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-          <input
-            className="input"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <input
+              className="input"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-          <input
-            className="input"
-            type="password"
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
+            <input
+              className="input"
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
 
-          <button
-            className="glow-btn full-width-btn"
-            onClick={handleSignUp}
-          >
-            Create Account
-          </button>
+            <button
+              type="submit"
+              className="glow-btn full-width-btn"
+              disabled={loading}
+            >
+              {loading ? "Creating Account..." : "Create Account"}
+            </button>
+          </form>
 
           <button
             type="button"

@@ -1,6 +1,3 @@
-const [showPopup, setShowPopup] = useState(false);
-const [popupMessage, setPopupMessage] = useState("");
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -11,12 +8,17 @@ import heroImage from "../assets/image.png";
 function Login() {
   const navigate = useNavigate();
 
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!email) {
       alert("Enter Email");
@@ -33,66 +35,73 @@ function Login() {
       return;
     }
 
+    setLoading(true);
+
     try {
       const response = await axios.post(
         "http://localhost:5000/login",
         {
-          email,
+          email: email.trim(),
           password,
         }
       );
 
-      alert(response.data.message);
+      const user = response.data.user;
 
       localStorage.setItem(
         "user",
-        JSON.stringify(response.data.user)
+        JSON.stringify(user)
       );
 
       navigate("/welcome");
     } catch (error) {
-      alert(
+      const message =
         error.response?.data?.message ||
-        "Login Failed"
-      );
+        "Login failed. Please try again.";
+
+      setPopupMessage(message);
+      setShowPopup(true);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="page">
       <div className="auth-container">
-        <div className="card auth-card">
 
-          <h1 className="title">
-            SAMAGAMA
-          </h1>
+        <div className="card auth-card">
+          <h1 className="title">SAMAGAMA</h1>
 
           <p className="subtitle">
             Sign In To Continue
           </p>
 
-          <input
-            className="input"
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+          <form onSubmit={handleLogin} className="auth-form">
+            <input
+              className="input"
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-          <input
-            className="input"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <input
+              className="input"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-          <button
-            className="glow-btn full-width-btn"
-            onClick={handleLogin}
-          >
-            Sign In
-          </button>
+            <button
+              type="submit"
+              className="glow-btn full-width-btn"
+              disabled={loading}
+            >
+              {loading ? "Signing In..." : "Sign In"}
+            </button>
+          </form>
 
           <div className="auth-footer">
             <p className="auth-footer-text">
@@ -106,7 +115,6 @@ function Login() {
               </button>
             </p>
           </div>
-
         </div>
 
         <div className="auth-side">
@@ -116,29 +124,31 @@ function Login() {
             alt="Login illustration"
           />
         </div>
+
         {showPopup && (
-  <div className="popup-overlay">
-    <div className="popup-card">
-      <h3>Account Not Found</h3>
+          <div className="popup-overlay">
+            <div className="popup-card">
+              <h3>Login Failed</h3>
 
-      <p>{popupMessage}</p>
+              <p>{popupMessage}</p>
 
-      <button
-        className="popup-btn"
-        onClick={() => navigate("/signup")}
-      >
-        Create Account
-      </button>
+              <button
+                className="popup-btn"
+                onClick={() => setShowPopup(false)}
+              >
+                Try Again
+              </button>
 
-      <button
-        className="popup-close"
-        onClick={() => setShowPopup(false)}
-      >
-        Close
-      </button>
-    </div>
-  </div>
-)}
+              <button
+                className="popup-close"
+                onClick={() => navigate("/signup")}
+              >
+                Create Account
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );

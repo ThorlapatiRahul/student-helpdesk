@@ -151,3 +151,77 @@ body{
   box-shadow:
   0 8px 18px rgba(17,24,39,.12);
 }
+
+
+/* ================= POPUP STYLES ================= */
+
+.popup-overlay{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.45);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  z-index:9999;
+}
+
+.popup-card{
+  width:100%;
+  max-width:500px;
+
+  background:#fbf8f2;
+  border:1px solid #e5ded2;
+  border-radius:24px;
+
+  padding:40px;
+
+  text-align:center;
+
+  box-shadow:
+  0 20px 50px rgba(17,24,39,0.18);
+}
+
+.popup-title{
+  font-size:42px;
+  font-weight:700;
+  color:#111827;
+  margin-bottom:15px;
+}
+
+.popup-message{
+  font-size:18px;
+  color:#374151;
+  line-height:1.6;
+  margin-bottom:25px;
+}
+
+.popup-btn{
+  width:100%;
+
+  background:#111827;
+  color:white;
+
+  border:none;
+  border-radius:12px;
+
+  padding:15px;
+
+  font-size:16px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:.3s;
+}
+
+.popup-btn:hover{
+  transform:translateY(-3px);
+
+  box-shadow:
+  0 8px 18px rgba(17,24,39,.18);
+}

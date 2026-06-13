@@ -18,4 +18,26 @@ const loginUser = async (email, password) => {
   return { token, user: { id: user.id, email: user.email } };
 };
 
-module.exports = { loginUser };
+const signUpUser = async ({ name, email, password }) => {
+  const existingUser = users.find(u => u.email === email);
+
+  if (existingUser) {
+    throw new Error('Email already exists');
+  }
+
+  const newUser = {
+    id: users.length + 1,
+    name,
+    email,
+    password,
+  };
+
+  users.push(newUser);
+
+  return {
+    message: 'User created successfully',
+    user: { id: newUser.id, name: newUser.name, email: newUser.email },
+  };
+};
+
+module.exports = { loginUser, signUpUser };
