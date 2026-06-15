@@ -13,3 +13,12 @@ const addQuery = async (userId, queryText) => {
 };
 
 module.exports = { addQuery };
+
+const getQueriesByUser = async (userId) => {
+  return queries.filter(q => q.userId === userId);
+};
+
+module.exports = {
+  addQuery,
+  getQueriesByUser
+};
